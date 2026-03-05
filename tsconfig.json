@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "commonjs",
+    "strict": true,
+    "noEmit": false,
+    "outDir": ".",
+    "skipLibCheck": true
+  },
+  "include": ["code.ts", "figma.d.ts"],
+  "exclude": ["node_modules"]
+}

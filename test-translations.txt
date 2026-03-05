@@ -1,0 +1,47 @@
+01_FR
+title
+Smart TV
+sub
+Télécommande
+01_DE
+title
+Smart TV
+sub
+Fernbedienung
+
+01_FR
+desc
+Boutons de la télécommande, joystick et raccourcis d'applications — le tout ensemble.
+01_DE
+desc
+Fernbedienungstasten, Joystick und App-Kurzwege — alles zusammen.
+
+01_FR
+title
+Universal
+sub
+Accès TV
+desc
+Compatible avec toutes les marques de smart TV.
+01_DE
+title
+Universal
+sub
+TV-Zugang
+desc
+Funktioniert mit allen gängigen Smart-TV-Marken.
+
+01_FR
+title
+Quick
+sub
+Jumelage
+desc
+Connectez-vous à votre TV en quelques secondes.
+01_DE
+title
+Quick
+sub
+Kopplung
+desc
+In Sekunden mit dem TV verbinden.

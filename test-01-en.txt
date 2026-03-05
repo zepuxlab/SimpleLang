@@ -1,0 +1,25 @@
+01_FR
+title
+Smart TV
+sub
+Télécommande
+01_DE
+title
+Smart TV
+sub
+Fernbedienung
+01_ES
+title
+Smart TV
+sub
+Mando
+01_IT
+title
+Smart TV
+sub
+Telecomando
+01_RU
+title
+Смарт ТВ
+sub
+Пульт

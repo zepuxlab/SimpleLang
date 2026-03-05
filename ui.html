@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px 14px;
+      background: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      color: #111111;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      min-height: 88px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 11px;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #111111;
+      box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.08);
+    }
+    button {
+      width: 100%;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    button:hover:not(:disabled) {
+      background: #333333;
+      transform: translateY(-1px);
+    }
+    button:active:not(:disabled) { transform: translateY(0); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .status {
+      min-height: 0;
+      padding: 4px 0 2px 0;
+      margin-bottom: 2px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: #555;
+    }
+    .status:empty { display: none; }
+    .notification {
+      min-height: 0;
+      padding: 4px 10px;
+      margin-bottom: 4px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    .notification.success { background: #e8f5e9; color: #2e7d32; }
+    .notification.error { background: #ffebee; color: #c62828; }
+    .notification.hidden { display: none; }
+    .hint {
+      font-size: 10px;
+      color: #888;
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+    .section {
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+    .section label { margin-bottom: 4px; }
+    input[type="password"] {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 12px;
+      font-family: inherit;
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #111111;
+      box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.08);
+    }
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #111111;
+      margin-bottom: 6px;
+    }
+    .btn-secondary:last-of-type { margin-bottom: 0; }
+    .btn-secondary:hover:not(:disabled) { background: #e0e0e0; }
+    .change-token {
+      display: block;
+      margin-top: 8px;
+      margin-bottom: 0;
+      font-size: 11px;
+      color: #555;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+    }
+    .change-token:hover { color: #111; }
+    .copy {
+      margin: 6px 0 0 0;
+      padding: 0;
+      font-size: 10px;
+      color: #999;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>SimpleLang</h1>
+  <label for="translationList">Список переводов</label>
+  <textarea id="translationList" placeholder="01_FR&#10;title Télévision intelligente&#10;sub Télécommande&#10;02_FR&#10;desc Boutons de télécommande,&#10;joystick et raccourcis..."></textarea>
+  <button type="button" id="startBtn">Создать локали</button>
+  <div class="status" id="status"></div>
+  <div class="notification hidden" id="notification"></div>
+  <div class="section">
+    <label for="mcpToken">MCP токен</label>
+    <input type="password" id="mcpToken" placeholder="••••••••••••" autocomplete="off" />
+    <button type="button" id="saveTokenBtn" class="btn-secondary">Сохранить токен</button>
+    <button type="button" id="changeTokenBtn" class="change-token">Сменить токен</button>
+  </div>
+  <p class="copy">Build 1.2</p>
+  <script>
+    (function() {
+      const mcpTokenEl = document.getElementById('mcpToken');
+      const saveTokenBtn = document.getElementById('saveTokenBtn');
+      const changeTokenBtn = document.getElementById('changeTokenBtn');
+      const translationListEl = document.getElementById('translationList');
+      const startBtn = document.getElementById('startBtn');
+      const statusEl = document.getElementById('status');
+      const notificationEl = document.getElementById('notification');
+
+      function setStatus(text) { statusEl.textContent = text || ''; }
+      function hideNotification() { notificationEl.classList.add('hidden'); }
+      function showNotification(message, type) {
+        notificationEl.textContent = message || '';
+        notificationEl.className = 'notification ' + (type === 'error' ? 'error' : 'success');
+        notificationEl.classList.remove('hidden');
+        if (message) {
+          clearTimeout(notificationEl._tid);
+          notificationEl._tid = setTimeout(function() { notificationEl.classList.add('hidden'); }, 6000);
+        }
+      }
+
+      parent.postMessage({ pluginMessage: { type: 'ready' } }, '*');
+
+      saveTokenBtn.onclick = function() {
+        const token = mcpTokenEl.value.trim();
+        parent.postMessage({ pluginMessage: { type: 'saveToken', mcpToken: token } }, '*');
+      };
+      changeTokenBtn.onclick = function() { mcpTokenEl.focus(); };
+
+      startBtn.onclick = function() {
+        const translationList = translationListEl.value.trim();
+        if (!translationList) {
+          showNotification('Вставьте список переводов.', 'error');
+          return;
+        }
+        hideNotification();
+        setStatus('Обработка…');
+        startBtn.disabled = true;
+        parent.postMessage({
+          pluginMessage: { type: 'start', translationList: translationList }
+        }, '*');
+      };
+
+      window.onmessage = function(event) {
+        const msg = event.data && event.data.pluginMessage;
+        if (!msg) return;
+        if (msg.type === 'init') {
+          mcpTokenEl.placeholder = msg.tokenSaved ? '•••••••• (сохранён)' : '••••••••••••';
+          return;
+        }
+        if (msg.type === 'tokenSaved') {
+          showNotification('Токен сохранён.', 'success');
+          mcpTokenEl.value = '';
+          mcpTokenEl.placeholder = '•••••••• (сохранён)';
+          mcpTokenEl.blur();
+          return;
+        }
+        if (msg.type === 'tokenError') {
+          showNotification('Ошибка сохранения: ' + (msg.message || ''), 'error');
+          return;
+        }
+        if (msg.type === 'status') setStatus(msg.message);
+        else if (msg.type === 'error') { setStatus(''); showNotification(msg.message, 'error'); }
+        else if (msg.type === 'success') { setStatus(''); showNotification(msg.message, 'success'); }
+        startBtn.disabled = false;
+      };
+    })();
+  </script>
+</body>
+</html>
